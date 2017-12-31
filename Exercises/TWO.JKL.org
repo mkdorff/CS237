@@ -1,0 +1,263 @@
+# Created 2016-07-06 Wed 10:22 
+#+OPTIONS: H:4 num:t toc:5 \n:nil @:t ::t |:t ^:t *:t TeX:t LaTeX:t 
+#+TITLE: TWO.JKL 
+#+AUTHOR: Mohonri Dorff 
+#+LANGUAGE: en 
+#+STARTUP: showeverything
+
+* TWO.JKL Exercises
+
+** UTT - Use This Thing 
+
+We have basic things like the addition rule and the multiplication
+rule. We can do great things with this.
+   
+We are given this equation for the number of permutations of n
+things taken r at a time.
+   
+P(n,r) = n(n - 1)(n - 2)(n - 3) ... (n - r + 1) = n! / (n-r)!
+   
+Here is my idea of a proof. I know that this should be done
+algebraically, so we'll see how well I can do this.
+
+We are taken r items from the sample. For the first r, we have n
+possiblities. The next will have n-1, then n-2, so we will multiple
+all those together. We stop when we have done r items - which is when
+that last r is equivalent to n - r + 1. We effectively are taking n!
+and truncating the lower parts of it. I will here give a numerical
+example.
+
+Say n = 9, r = 3.
+
+9 * (9 - 1) * (9 - 2) gives us the possiblities for the first three
+items (which is all we need). Notice, the reason we subtract one each
+time is because we are not replacing the items.
+
+If we take 9! (9*8*7*6*5*4*3*2*1) and divide from it so that only
+9*8*7 is left. We need 6! in the denominator. How convenient, 9 - 3 =
+6. Using that, we can always truncate the bottom ones we don't need.
+   
+Therefore,
+   
+n! / (n-r)!
+   
+** OWE - Oscar Wins Everything
+
+0! is defined to be 1. Mathematics has made it so, though that
+isn't really an explanation. As far as I have been able to gather, 0!
+is sort of a scalar identity for factorials. Matrices, and other
+things that satisfy the vector space rules, have their scalar
+indentity. I imagine this is very much the same, though I can't
+conclude if factorials constitutes a vector space.
+   
+If we have simple permutations of n = 9, the equation is simple and
+the total is 362880. If we apply the equation for n = 9, taken 9 at a
+time (r), the denominator (n-r)! would be 0!. It can't be be 0,
+because we can't divide by zero. Therefore, 0! is an identity and
+evaluates to 1.
+
+** UTS - Umbrella Terminal Sickness
+
+ABCDELMNO is our set. There are 362880 possible arrangements (no
+replacement, order matters).
+
+How many contain the string ELM?
+
+At first, I had no idea how to tackle this. I wrote some c++ to
+enumerate all the permutations and returned a count for each one that
+included the string "ELM." The result was 5040. I am confident this is
+the right answer and I am also confident this is possibly the second
+worst way to do this exercise, the worst being a sad attempt to do it
+by hand.
+
+I spoke with Matt Bloomfield. He is a wizard. He pointed out the "ELM"
+becomes on identity and that really reduces the set to 7 items: "ELM"
+"A" "B" "C" "D" "N" "O"
+
+The problem is now trivial. The possible combinations is 7! which is
+5040. This is our set we want and it is really a subset of the 362880
+arrangements.
+
+** UTA - Utah Transit Authority
+
+P(n,r) = n! / (n-r)! C(n,r) = n! / ((n-r)!r!)
+
+There typically are less combinations then there are permutations, the
+reason being that for one combination, there can be multiple
+permutations. The basic equaitons are listed above. The main
+difference is that r! in the denominator for combinations. If that
+number is greater than 1, it will cause the total number of
+combinations to be less than permutations. Therefore, the only case
+combinations isn't less then permutations is when we choose r = 1,
+(assuming r can't be zero or negative).
+
+** OWN - Ordinary Wizarding Nerd
+
+How many TLAs (arrangements of 3 alphabetic letters) are there with
+repetition allowed?
+
+There are 26 since letters in our alphabet. If repition is allowed,
+the multiplication rule leads us to compute that the total
+permutations is 26 * 26 * 26 (26 possibilities for each position).
+
+26^3 = 17,576 total possible arrangements
+
+I feel like this is too simple.
+
+** OED - Overt Energy Dispatchers
+
+"Sequence" means what? order matters, repitition is allowed ?
+
+As far as I've been able to gleam, a sequence would mean that order
+matter and that repitition is allowed. For this promt, we take two
+seperate events (OR) and we add them together.
+   
+For people with two initials, the possible sequences totals 26 * 26
+= 676. For people with three initials, the possible sequences totals
+26*26*26 = 17,576
+
+The total different sequences then would be 676 + 17,576 = 18,252
+
+** OMI - Onion Must Iterate
+
+How many different sequences can be formed using either two or
+three letters (A-Z) followed by either two or three digits (0-9)?
+   
+There should be 4 general cases that we will have to consider and
+since they are all possible (OR) they will all be added together for
+the total.
+   
+   1. 2let & 2dig 
+      - letters: 26 * 26 = 676 
+      - digits: 10 * 10 = 100 
+      - total: 67,600 
+   2. 2let & 3dig
+      - letters: 26 * 26 = 676
+      - digits: 10 * 10 * 10 = 1,000
+      - total: 676,000
+   3. 3let & 2dig
+      - letters: 26 * 26 * 26 = 17,576
+      - digits: 10 * 10 = 100
+      - total: 1,757,600 
+   4. 3let & 3dig
+      - letters: 26 * 26 = 17,576
+      - digits: 10 * 10 * 10 = 1,000
+      - total: 17,576,000
+
+67,600 + 676,000 + 1,757,600 + 17,576,000 = 20,077,200 total different
+sequences.
+
+** UMS - UHHHMMMMSSSSSS 
+
+FILL IN THE ;;...
+
+I'm really not sure what this is asking. Event and space will
+probably be passed in as a integer and a straight divide will only
+return 0 or 1. They will have to be cast into floats. That can be done
+with the following code, which is now modified.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defun probability (event space)
+  "A function that takes an event and a space and returns a number between 0 and 1."
+  (let ((result (/ (float event) (float space))))
+    resultt
+    ))
+#+END_SRC
+
+** OEK - Ordinary Expressions Kill
+
+Generalize the above to deal with the experiment of flipping 2n
+coins. Find the probability of the event that n will be heads, and n
+will be tails. Your answer should be a function of n.
+
+If we're looking for the events of n heads or tails in n size space,
+then the number of time that even happens can only be one for each
+case so the probability would be 1 over the space. The space would be
+2^n because there are two options for each flip. Therefore, the
+equation is: 
+
+1/(2^n)
+
+** ORD - Object Routed Dancing
+
+What is the probability that when randomly selecting a permutation of
+the 26 letters (assumed all uppercase) of the alphabet the following
+events will occur:
+
+The first 13 letters will be in alphabetical order.
+
+I will first define the space size out of these 26 permutations. This
+will be used as the denominator for the probailites in each case. The
+space size is 26! = HUGE. Just kidding, it is 403291461126605635584000000.
+
+If we consider the event of the first 13 letter in alphabetical order,
+we can just treat "ABCDEFGHIJKLM" as one item and the remainer will be
+13! different permutations. The equation would thus be 
+
+13!/26! which gives us .00000000000000001544 as the probability of the
+happening. This isn't very high.
+
+** ORG - Orange Racing Games
+
+The first and last letters will be B and Y.
+
+Same concept as above, we are left with 24 characters to permuate in
+the middle so the equation becomes
+
+24!/26! = .001538
+
+This is much more likely.
+
+** ORS - Office Rights Signing
+
+The letter I will come before both J and K.
+
+I J K should be set so it is 23!/26! In the denominator, we need to
+add certain times when I isn't before J and K. That means these kind
+of cases:
+
+... I J K
+... I .. J K
+We have to account for the permutations where I is not the most left
+so the times JK are on the right of it will not work. I propose thatit
+is half the time because the other half of the time they stay on the
+right. So the equation should be:
+
+23!/(26!*2) = .00003205
+
+** UFO - Unidentified Flying Object
+
+The letters O and P will be next to each other.
+
+12  23  34...
+OP  OP  OP...
+PO  PO  PO...
+
+The remaining of course being filled with 24! There are 25 positions
+OP/PO can be in. 2 different cases for each slot so the equation we
+are left with is:
+
+(50*24!)/26! = .07692
+
+** UVW - Unprecedented Villian Wishes
+
+The letters U and V will be separated by at least 23 letters.
+
+  U ....... V
+  U ....... V .
+. U ....... V .
+  V ....... U
+  V ....... U .
+. V ....... U
+
+There are 6 different cases where this is true. The remaining ...'s
+can be computed by the remaining amount of letters left (24). So for
+each case, there is 24! possible combinations. The equation is thus:
+
+(6 * 24!)/26! = .009231
+
+
+* Collaborators
+
+Matthew Bloomfield & Aaron Pobst helped me a bit where I was stuck and explained
+certain things.

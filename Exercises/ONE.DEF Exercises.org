@@ -1,0 +1,73 @@
+# Created 2016-05-17 Tue 23:08
+#+OPTIONS: H:4 num:nil toc:nil \n:nil @:t ::t |:t ^:t *:t TeX:t LaTeX:t
+#+TITLE: ONE.DEF Exercises
+#+AUTHOR: Mohonri Dorff
+#+LANGUAGE: en
+#+STARTUP: showeverything
+
+* Heading to head all things ORG
+  To submit the exercise, I suppose I'll just copy what I had in my scratch and tangle the lisp code. Other than talking about things with Matt in class, I did no further collaboratin.
+
+#+BEGIN_SRC emacs-lisp
+ONE.DEF
+(defun list-some-computations-on (a b c d)
+  (list (+ a b) (/ d b) (- d a) (* c d)))
+list-some-computations-on
+
+(list-some-computations-on 1 2 3 4)
+(3 2 3 12)
+
+; Well of course there isn't any restriction on the objects a function can return or recieve. That's still pretty common in other languages as well (though C++ has a return type and the compiler evaluates the function being passed in) Though, functions need prototype parameters...
+
+(defun square (number)
+  "Squaring is multiplying a number by itself..."
+  (* number number))
+square
+
+(square 5)
+25
+
+(let ((letters "abc"))
+  (list  (symbol-name 'letters) (symbol-value 'letters) letters))
+("letters" "abc" "abc")
+
+(= 3 4)
+nil
+
+; 2.2.3.2
+; this will obvious be nil
+(let ((x 2)
+      (y 3)
+      (z 7))
+  (= (+ x y z) (* x y z )))
+nil
+
+(let ((x 0)
+      (y 0)
+      (z 0))
+  (= (+ x y z) (* x y z )))
+t
+; but it depends on if we're counting 0 as a number
+
+
+; 2.2.3.3
+; = is a equal to comparator
+; I'll guess output will be (nil nil nil t)
+; ?evaluates the following character as a character.
+(let ((a 1)
+      (b 2)
+      (c 1))
+  (list (= 1 2) (= a b) (= ?a ?A) (= a c)))
+(nil nil nil t)
+
+
+; 2.2.7
+; Upside down A symbol. EACH or EVERY
+
+; 2.2.8
+; Backwards E symbol. There EXISTS
+
+; 2.2.12.1
+; D&C 130:20-21
+; Answer is B. ANY/EVERY blessing is predicated on SOME law.
+#+END_SRC

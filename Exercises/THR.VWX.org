@@ -1,0 +1,157 @@
+# Created 2016-07-11 14:33
+#+OPTIONS: H:4 num:t toc:5 \n:nil @:t ::t |:t ^:t *:t TeX:t LaTeX:t 
+#+TITLE: THR.VWX
+#+AUTHOR: Mohonri Dorff 
+#+LANGUAGE: en 
+#+STARTUP: showeverything
+
+* THR.VWX
+
+** TWA
+
+How does allowing cycles imply the existence of more than one path
+from one node to another?
+
+The book defines a cycle as a path from a node back to itself. If
+nothing else, the initial node will have to have at least two edges to
+two nodes and those two have an edge connecting them. It would form a
+triangle. So, the existence of a cycle would force at least two paths
+from one node to another. If we have A, B, & C, A to C would be one
+path and A to B to C would be another. Obviously as we increase the
+number of nodes in the graph it would only add to the number of paths.
+
+** TED
+
+What is the degree sequence of the Intermountain West adjoining states
+graph?
+
+We have to list the degrees of all the nodes in nonincreasing order.
+
+| MT | ID | WY | NV | UT | CO | AZ | NM |
+|  2 |  4 |  4 |  3 |  5 |  3 |  3 |  2 |
+
+Now in the form we need: [5 4 4 3 3 3 2 2]
+
+** WET
+
+What can you say about a graph if all you know is its degree sequence?
+
+At the very least, we know how many nodes are in the graph and how
+many edges there are. I think a degree sequence is unique per graph
+though I can't prove it. So we have a skeleton to a graph and general
+relationships between vertices if it is unqiue. I believe the fact
+that the sum of all the vertices is twice the number of edges helps
+prove that.
+
+** TEE
+
+Any undirected graph has an even number of vertices of odd degree.
+
+
+
+** WER
+
+Is there (can there exist) a graph with degree sequence [3 2 1 0]?
+Justify your answer.
+
+No. Mainly because I tried for about 20 minutes to draw a graph with
+that degree sequence. To try to prove it though, we have to have 4
+nodes. One of them isn't connected to any thing and the first one is
+needs to be connected to 3 nodes. It can only be connected to 2
+because of the last stated reason so this graph can not exist.
+
+** TMI
+
+How many edges are there in Cn, as a function of n?
+
+The number of edges on Cn = n. That is seemingly by definition.
+
+** WEG
+
+How many edges are there in Wn?
+
+Each W graph is effectively the same as the C graph but with the extra
+node in the center. I always have to o things numerically to prove it
+to myself. So:
+
+|   | 3 | 4 |  5 |  6 |  7 |
+| C | 3 | 4 |  5 |  6 |  7 |
+| W | 6 | 8 | 10 | 12 | 14 |
+
+This is pretty apparent laid out but Wn will always be Cn * 2 because
+the extra node connects to the remaining nodes which is the number n.
+
+** TEA
+
+Q0 has 1 node and 0 edges. In general, Qn has 2n vertices, and how
+many edges?
+
+|       | Q0 | Q1 | Q2 | Q3 | Q4 |
+| EDGES |  0 |  1 |  4 | 12 | 32 |
+| NODES |  1 |  2 |  4 |  8 | 16 |
+
+We were given 2^n for the number of vertices. The edges increase but
+the factor by which is increases seems to decrease.
+
+To calculate the number of edges, we will multiple by n 
+so 0, 1, 2, 3, 4
+we are left with needing to get 
+   0, 1, 2, 4, 8
+which is easy enough. That would be 2^(n - 1)
+
+So the general equation for Qn is 2^(n-1)*n
+  
+
+** TRY
+
+Investigate bipartite graphs and complete bipartite graphs. What kinds
+of applications fit these types of graphs?
+
+All the explanations online are hard. Hopefully, the way I understand
+it si correct and simpler. Simply said, a bipartite graph is a graph
+that can have two distinct sets and each vertex in a set is connected
+to another in the other set. A complete bipartite graph is an
+extension of such where on vertex in a set is connected to all
+vertices of the next set. The buzz word affiliation network was used,
+but it is here very applicable. Whenever there are two different
+classes of objects, this can show the relationship between the two.
+
+** WID
+
+The intersection of two graphs — what can you say about that?
+
+If we are looking for an intersection, we have to take each node from
+one graph and see if it corresponds with a node from the other graph
+(which includes the number of edges it has). If we were to right it in
+terms of its degree sequence, we would see one as a subset of the
+other. For example, [5 4 4 4 3 1 1] [3 1 1] This sort of thing. I
+don't think those are real graphs but that illustrates the point.
+
+** WIT
+
+What does it mean to say that VWX has ([2 1 1] [2 2 2 1 1] [4 1 1 1
+1]) as its list of degree sequences?
+
+This means that the entity titled VWX is actually 3 different
+graphs. It would look something like this.
+
+    A          D             
+   / \         |            
+  B   C        E             
+               |         
+               F             
+               |
+               G
+               |
+               H
+
+  I
+  |
+J-K-L
+  |
+  M
+
+* Collaborators
+
+Aaron Pobst and Matthew Bloomfield helped out whenever I was a little
+lost. Especially on TEA, I was lost on that one.

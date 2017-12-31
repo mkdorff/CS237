@@ -1,0 +1,430 @@
+# Created 2016-07-06 Wed 15:12 
+#+OPTIONS: H:4 num:t toc:5 \n:nil @:t ::t |:t ^:t *:t TeX:t LaTeX:t 
+#+TITLE: TWO.MNO 
+#+AUTHOR: Mohonri Dorff 
+#+LANGUAGE: en 
+#+STARTUP: showeverything 
+
+* TWO.MNO
+
+** OVE
+
+Finish writing in first-order logic (predicates and quantifiers) the
+RHS of composite(p) <–> …
+
+prime(n) <-> \forall x \forall y [(x > 1 ^ y > 1) -> xy ≠ n]
+
+composite(n) <-> \exists x \exists y [(x > 1 ^ y > 1) -> xy = n]
+
+** OFF
+
+Experiment to see that there are gaps of many (with one exception,
+even-numbered) sizes between consecutive primes.
+
+2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67
+ 1 2 2 4  2  4  2  4  6  2  6  4  2  4  6  6  2  6
+
+We see that with the exception between 2 and 3, all of the gaps are
+even numbers. There seems to be a general trend that as the primes get
+larger, the gaps between also get larger. This small sample set isn't
+enough to remotely prove this. We will grab an RNR, random-not-random,
+sample of much larger integers to see. 
+
+600000004517   600000004553   600000004613   600000004619
+            36             60             6
+600000004649   600000004679   600000004687   600000004697
+            30             8              10
+600000004787   600000004847   600000004871   600000004873 
+            60             24             2
+
+I can haphazardly and confidently conclude that there are many number
+of gap sizes, possibly infinite. As we have concluded that there is no
+biggest prime, there likely isn't a biggest gap.  
+
+** OIL
+
+Write some lisp code to facilitate this — like a frequency table and
+average gap size in the first 10 million primes.
+
+
+
+
+
+** UGO
+
+Also with code, investigate the (in)famous Twin Prime Conjecture and
+its generalized version.
+
+The Twin Prime Conjecture states that there are an infinite number of
+twin primes, a twin prime being a set of two primes numbers that
+differ in value only by 2. We can explore this more effectively if we
+show some results with the following code.
+
+
+
+
+** OXI
+
+Also with code, check and make sure you understand that when factoring
+an integer n, you need do trial divisions only by integers less than
+or equal to the square root of n. Why is that the case?
+
+
+We can reason out that if we're listing all the factors of a number,
+say 36, you would do the pairs: 1-36, 2-18, 3-13, etc. As soon as you
+get to the halfway mark, the numbers start flipping and you have
+duplicate factors. The square root of the number gives us the halfway
+point so we would only need to do trial division for those less then
+the square root. We can see this with code as well.
+
+
+
+
+** OGL
+
+See if this function computes n2 - n + 41.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defun poly (n)
+  (- (* n n) n -41))
+#+END_SRC
+
+It seems to do exactly that.
+3  => 47
+5  => 61
+10 => 131
+
+** OLD
+
+Write another function to see how often (for which values of n) poly
+is prime. Try at least 10 million candidates.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defun is-poly-prime (n)
+  (setq list '())
+  (loop for i from 0 to n
+	when (is-prime i)
+	do (if (is-prime (poly n))
+	       (append list (poly n))
+	     nil)))
+#+END_SRC
+
+This doesn't work though.
+
+#####################################################
+
+** OLO
+
+Explore with code and answer, true or false? If m is a factor of a and
+n is a factor of a, then mn is a factor of a.
+
+#####################################################
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+
+#+END_SRC
+
+The algorithm I would use it to put in a number n and we will iterate
+from 1 to n. We will then have a sepereate function that returns all
+the factors of n. We take those and iterate the first x second, first
+x third until we get to the end. Then we start from the second and do
+the same. If ever there is a product of the two factors that doesn't
+modulos divide the current n with 0, then we know this is false.
+
+I think even without code we can see that it is false. Let us say that
+a is 12. The factors of 12 are 1, 2, 3, 4, 6, 12. Taking any two:
+
+12 x 6 is not a factor of 12
+4 x 2 is also not a factor of 12
+
+Thus, this is false.
+
+** USE
+
+###################
+
+The number 2^3 × 3^2 × 561 has a certain number of factors. How does
+knowing 360's prime factorization allow you to immediately say it has
+24 factors?
+
+The prime factorization gives us a method to calculate how many
+factors a number has. We take the powers (3, 2, 1) add 1 to each (4,
+3, 2) and multiply them together and we get 24. I don't understand the
+proof to it, but I understand that it works.
+
+
+** OYP
+
+#####################
+
+The number 627023653815768 is divisible by 3, 4, 6, 8, 11 and 24, but
+not by 9 or 16. Without doing trial division, how do you quickly
+verify these facts?
+
+
+
+
+** OAR
+
+Coprime: When two number's only shared factor is one.
+
+More prime pursuits for the intrepid: a famous theorem states that
+there are infinitely many primes of the form ak + b whenever a and b
+are coprime. Try to find a counterexample to get a feel for this. Use
+lots of different k's.
+
+|  A |  B | K | Result |
+|----+----+---+--------|
+| 35 |  6 | 2 |     76 |
+| 35 |  6 | 3 |    111 |
+| 35 |  6 | 9 |    321 |
+| 21 | 16 | 2 |     58 |
+| 21 | 16 | 3 |     79 |
+| 21 | 16 | 9 |    205 |
+
+The very first example is a counterexample, so this theorem isn't
+always true. In fact, all of them aren't prime except for 79. I would
+imagine there would be an infinite amount of primes that statify this
+since we have already established that there are an infinite amount of
+primes.
+
+
+** UND
+
+A famous conjecture (not theorem) states that every even number
+appears infinitely often as a gap between consecutive primes. This
+statement has not been proved. Nor has it been disproved. As hinted
+above, even proving infinitely many twin primes (gap of 2) remains
+elusive. Indeed, the Twin Prime Conjecture is an active area of
+mathematical research, both in finding twins and in attempting to
+prove (or disprove) they never run out. How does this grab you?
+
+I don't know how things can be proven for infinite things. In a case
+like this, it would seem to be equally hard to disprove it. All I can
+say is from personal experience of seeing the gaps, I see the lower
+number gap far more often then higher number but that's the only
+pseudoevidence I can scrape.
+
+** OPT
+
+Are there arbitrarily large gaps between successive primes, or in
+other words, for any natural number r, is there a sequence of (at
+least) r consecutive composite numbers?
+
+I feel like this is like the above. We can't conclude very much about
+gaps between primes so we can't prove or disprove this one. I know
+they can't be arbitrary, but it does seem like that to us now.
+
+** ONE
+
+What is the first CCS of length 2? 3? 4? … 10? Not the first, nor the
+only one, but this provably is one such sequence:
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defun factorial (n)
+  (if (zerop n)
+      1
+    (* n (factorial (1- n)))))
+
+(defun consecutive-composite-numbers-sequence-of-length (r)
+   (let ((r+1-factorial (factorial (1+ r))))
+     (loop for n from 1 to r
+        collect (+ r+1-factorial n 1))))
+#+END_SRC
+
+############################### WUT?
+
+** OPQ
+
+Write code (e.g., flesh out) to verify that the above defined sequence
+contains naught but composites. Note that in a sequence of consecutive
+numbers, every other one is even, hence composite, every third one is
+a multiple of 3, hence composite, etc. But is there a better way to
+see this than sifting through the sequence looking for primes somehow
+hiding among all those composites? How would you prove it?
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defun all-composite (r) ...)
+#+END_SRC
+
+** UBI
+
+Verify the following:
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(= (gcd 56 8) 8)
+(= (gcd 65 15) 5)
+(= (lcm 5 7) 35)
+(= (lcm 4 6) 12)
+(= (gcd 28 65) 1)
+#+END_SRC
+
+Two composite can be coprime.
+
+The results are pretty simple; all of the above returned t. 
+
+** UPX
+
+Write a function to check whether or not any given set (e.g., [2 3 4
+35]) is a set of coprime integers.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defun gcd-set-t-or-nil (setList)
+  (let* ((gcd-1 t)
+	 (count 0))
+    (loop for i in setList
+	  do (setq count1 (+ count 1))
+	  do (loop for (+ count 1) to (length setList)
+		   do (if (= 1 (gcd i (nth count1 setList)))
+			  t
+			(setq gcd-1 nil))
+		   do (setq count1 (+ count1 1)))
+	  do (setq count (+ count 1))
+	)))
+#+END_SRC
+
+Well that was my weird sad attempt to rihgint a function. It didn't work.
+
+** WCM
+
+The GCD of 2^3 * 3^2 * 5 and 2^2 * 3^3 * 7 is 2^2 * 3^2, or more helpfully,
+2^2 * 3^2 * 5^0 * 7^0. Why more helpfully?
+
+When we are trying to find the GCD, we are looking for the
+intersection of the prime factorizations. When we right it out in
+full, we can see the actually intersection, that it is only 2^2 and 3^2.
+
+** TCA
+
+The prime factorization of 126 is 2^1 * 3^2 * 7^1. Write this in the more
+helpful (canonical) form.
+
+I can't seem to find too much on the internet about it since most
+places seem group normal prime factorization and canonical
+together. What I noticed in some places is that it look like they just
+wrote it out in straight multiplication. Therefore, 126 would look like:
+
+126 = 2 * 3 * 3 * 7
+
+** WDN
+
+Verify that for many pairs of integers a and b:
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(= (* (gcd a b) (lcm a b)) (* a b))
+
+(defun aaaabbbb (a b)
+  (= (* (gcd a b) (lcm a b)) (* a b)))
+
+(aaaabbbb 900000 900003)
+t
+
+(aaaabbbb 900000 90)
+t
+
+(aaaabbbb 12879 90)
+t
+
+(aaaabbbb 30 12)
+t
+#+END_SRC
+
+This holds true for many cases.
+
+Can you prove this equality necessarily holds for all integer pairs?
+
+If a and b are coprime, the gcd will be one and the lcm will be a * b,
+so obviously, a*b = a*b. I can't really give a proof as to why they
+work for non-coprimes and frankly, I'm not convinced this always holds.
+
+** TOC
+
+Make sure you understand how this recursive version of the above
+iterative algorithm works:
+
+Try it with some random n and b:
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defun alternate-base-representation (n b)
+  (let ((d (div n b))
+        (m (mod n b)))
+    (if (zerop d)
+        (list m)
+      (append (alternate-base-representation d b) (list m)))))
+
+(alternate-base-representation 987654321 127)
+
+(alternate-base-representation 987654321 127)
+(3 101 20 87 86)
+
+(alternate-base-representation 9 2)
+(1 0 0 1)
+
+(alternate-base-representation 321 2)
+(1 0 1 0 0 0 0 0 1)
+
+(alternate-base-representation 1234 3)
+(1 2 0 0 2 0 1)
+#+END_SRC
+
+I'm convinced. In ECEN classes, we do a fair bit of binary, decimal,
+and hex conversion and the method is the same. I just through it some
+values I would know pretty readily.
+
+** TOO
+
+Verify the correctness of this implementation of Euclid's algorithm
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defun gcd-candidate (a b)
+  (let ((x a) (y b) r)
+    (while (not (zerop y))
+      (setq r (mod x y) x y y r))
+    x))
+
+(gcd-candidate 2234 2342349)
+1117
+
+(gcd-candidate 24 36)
+12
+#+END_SRC
+
+We needed this function dearly in the RSA exploration that I did so
+I'm very confident that this works. The larger number is equal to two
+other things and it keeps breaking down until we get to a gcd, and
+ideally, for primes or coprimes, we want that to be 1.
+
+** TOW
+
+Compare gcd-candidate with the built-in gcd function. Is it faster or
+slower?
+
+I honestly do not know. gcd-candidate yses Euclid's algorithm and I
+do believe it is the most efficient algorithm, or I've heard of none
+better.
+
+** TOE
+
+Try implementing gcd-a-la-Euclid (like Euclid did, only not in lisp)
+without using mod.
+
+... hrm
+
+** WOR
+
+Try implementing a recursive version of gcd.
+
+... huhmmm
+
+* Report
+
+There was a lot of stuff about number theory in here and I definitely
+learned a lot. I think I understand /how/ most of the stuff in here
+works, I just can't recreate it. It's a familiarity with instead of a
+deep understanding of. Hopefully, it will come with time. 
+
+* Collaborators
+
+I got help from Matt Bloomfield and Erick Allsop. Matt more so
+explained things as I would ask him but we all used the is-prime
+function Erick had. It was very helpful. 

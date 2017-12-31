@@ -1,0 +1,128 @@
+# Created 2016-07-13 Wed 16:22 
+#+OPTIONS: H:4 num:t toc:5 \n:nil @:t ::t |:t ^:t *:t TeX:t LaTeX:t 
+#+TITLE: THR.STU
+#+AUTHOR: Mohonri Dorff 
+#+LANGUAGE: en 
+#+STARTUP: showeverything
+
+* THR.STU Exercises
+
+** TOA
+
+Investigate and report on some tactics for storing arbitrary data
+items in tree nodes.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(cons 'a 'b)
+(a . b)
+(cons (cons 'a 'b) (cons 'c 'd))
+((a . b) c . d)
+
+(cons 'a (cons 'b (cons 'c (cons 'd nil))))
+(a b c d)
+
+(setq orange 612)
+612
+
+(cons 4 (cons (cons orange 'a) '("meow" 12)))
+(4 (612 . a) "meow" 12)
+#+END_SRC
+
+Mapping what's on a tree and how it is represented in lisp is a little
+confusing to me. using the example given to us at the end, I think by
+default lists will branch 'left' for the one item and otherwise branch
+'right' into the rest of the tree (meaning nil at the end when we hit
+it). The node that has to two edges doesn't have an internal inherit
+value. It's more about the branch path, it seems.
+
+I have also discovered that lisp doesn't care what kind of data typt
+you put into the tree/list. Thus, the last entry in the e-lisp code is
+totally legal and that's powerful. It might be unsafe if you don't
+know what you're doing but it definitely allows for flexbililty. It
+allows allows vairables, etc.
+
+** TON
+
+Investigate various ways to rebuild unbalanced BSTs to make them
+balanced. In a balanced tree, all leaves are on the same level, or
+within one level of each other. So the balanced version of the BST we
+built above is:
+
+
+        cool
+       /    \
+      /      \
+    are	      the
+   /   \      /  \
+and binary search trees
+	    /  \     \
+	  kind so  wonderfully
+
+The above came from:
+
+                                              trees
+                                              /   \
+					    are	 wonderfully
+					    /  \
+                                          and cool
+					      /	 \
+       	       	       	       	       	  binary the
+						 /
+					       search
+					       /  \
+					    kind  so
+
+					    
+I'm not the best at these and I'll admit it, but generally we count
+the length of the longest branch and if it isn't with 1 of all the
+other branches lengths, then we move the 2nd highest node on the
+longet branch up and move the root node to a child of it. We keep
+readjusting until everything is within one level of the others. As I
+understand it, there are many different alogrithms to balancing as
+well. As long as we're consistent, the balancing and accessing works well.
+
+
+** WTO
+
+Investigate what must happen to delete a key from a BST.
+
+When we attempt to delete a node, we must take into account the
+children the node has and where it is on the tree. If it has two
+children, the 'higher' child gets promoted. If that node has two
+children than that node will have 3 children and one had to be demoted
+as a child to another. This process repeates until every node has 2,
+1, or 0 children.
+
+** TWO
+
+What about tie-breaking?
+
+For Huffman trees, there must be some criteria set ahead of time on
+how tie breaking will work. If we're doing frequency of letters and we
+have two letters, a and b that are both used 4 times, there isn't any
+inherit rule governing this, so we must declare it by saying, "In the
+case of a tie, the lower alphabetical value (a < b) will be to the
+left."
+
+** TTT
+
+What is the significance of CAFEBABE?
+
+Assuming we are working with the Huffman tree we just made in the
+book, it is significant because the encoded version is 3 bits lets
+then the non encoded version. It doesn't seem like very much but it
+definitely adds up especially considering all the data we use now. A
+12.5% reduction in size is very significant.
+
+* Report
+
+I learned a lot about trees in the Data Structures class though I
+didn't fully understand them. I learned a great deal more and I
+actually feel comfortable with Huffman trees now. 
+
+* Collaborators
+
+As always, the main people I work with are Matthew Bloomfield and
+Aaron Pobst. There wasn't all too much I needed help with this time
+but I didn't really have a clue why CAFEBABE was important and that's
+what they told me so that was helpful. I then contemplated it.

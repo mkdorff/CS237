@@ -1,0 +1,183 @@
+#+OPTIONS: H:4 num:nil toc:nil \n:nil @:t ::t |:t ^:t *:t TeX:t LaTeX:t
+#+TITLE: ONE.ABC
+#+AUTHOR: Mohonri Dorff
+#+LANGUAGE: en
+#+STARTUP: showeverything
+
+* Scratch, notes and exercises from ONE.ABC
+  Here I tangle things! Don't really know what else I'll need to
+  upload but this should be everything
+
+#+BEGIN_SRC emacs-lisp
+
+[A C B]
+[A C B]
+
+(elt [A C B] 1)
+C
+
+(elt [A C B] 2)
+B
+
+(elt [A C B] 3)
+;; returns with error, out of range
+
+(elt [A C B] 0)
+A
+
+(elt [A C B] 4)
+;; same, this is way out of range
+
+;; Three examples of propositions:
+;; It is true that my house is 1400 sq feet.
+;; It is false that I do not own a dog.
+;; It is true that I have 2 feet.
+
+;; Three examples of nonpropositions:
+;; That house is big. (ambiguity)
+;; You are cool.
+;; This is yummy.
+
+;; So (if p (not q) q)...
+(setq true t)
+t
+(setq false nil)
+nil
+
+
+;; This whole bit is a tertiary operator!
+(if false (not false) false)
+nil
+
+(if false (not true) true)
+t
+
+(if true (not false) false)
+t
+
+(if true (not true) true)
+nil
+
+
+cond
+"Try each clause until one succeeds.
+Each clause looks like (CONDITION BODY...).  CONDITION is evaluated
+and, if the value is non-nil, this clause succeeds:
+then the expressions in BODY are evaluated and the last one's
+value is the value of the cond-form.
+If a clause has one element, as in (CONDITION), then the cond-form
+returns CONDITION's value, if that is non-nil.
+If no clause succeeds, cond returns nil.
+
+(cond CLAUSES...)"
+
+;; this kind of format
+(cond
+ (true true)
+ (false false))
+t
+
+(cond
+ (false [A B C])
+ (true "Hello World!"))
+"Hello World!"
+
+;; So I guess this is another format LISP has for doing COND-itionals
+
+
+(and true (or false (not true)))
+nil
+
+(or (and true false) (not true))
+nil
+
+;; they're the same, in this case it doesn't matter, but as a general rule, it
+;; definitely matters
+
+| (p | ^ | q) | v | ¬ | r |
+|----+---+----+---+---+---|
+|  0 | 0 | 0  | 1 | 1 | 0 |
+|  0 | 0 | 0  | 0 | 0 | 1 |
+|  0 | 0 | 1  | 1 | 1 | 0 |
+|  0 | 0 | 1  | 0 | 0 | 1 |
+|  1 | 0 | 0  | 1 | 1 | 0 |
+|  1 | 0 | 0  | 0 | 0 | 1 |
+|  1 | 1 | 1  | 1 | 1 | 0 |
+|  1 | 1 | 1  | 1 | 0 | 1 |
+
+;; Pretty useful tool. It's odd that the answer shows up under the operator
+;; and not to the right
+
+(let () 1 2 3)
+3
+
+;; so I need to define a variable?
+(defvar a)
+a
+
+(defvar b)
+b
+
+(defvar c)
+c
+
+(let ((a 1) (b 2) (c 3)) (+ a b c))
+6
+;; so many errors. This took so long
+
+(let ((a 1) (b 2) (c 3)) (+ a b c d))
+;; an error occurs, which is obvious, d isn't delcared
+(defvar d)
+d
+
+(let ((a 1) (b 2) (c 3)) (+ a b c d))
+;; still doesn't have a value anyways
+
+(let ((a 1) (b 2) (c 3)) [+ a b c d])
+[+ a b c d]
+;; it's just a set list.
+
+;; I'm predicting this will be 10
+(let ((a 1) (b 2) (c 3) (+ 4)) (+ a b c +))
+10
+;; yay
+
+(let ((a 1) (b 2) (c 3) (d (+ a 4))) (+ a b c d))
+;; error
+
+(let* ((a 1) (b 2) (c 3) (d (+ a 4))) (+ a b c d))
+11
+;; The internets said that the * does a sequential binding and no * means
+;; parallel. That makes sense because (d (+ a 4)) needs a to evaulate and I
+;; guess * forces a to be defined before it is used
+
+;; we could do it without the star, but it'd be in multiple lines. Or something
+;; crazy I've never heard of.
+
+
+;; other math operations work if you know what you're doing. You can use - to,
+;; as long as you use () when you need things to evaluate first for order of
+;; operations
+
+;; predict: we'll have a list that is (3 2 3 12)
+(let ((a 1) (b 2) (c 3) (d 4)) (list (+ a b) (/ d b) (- d a) (* c d)))
+(3 2 3 12)
+;; yay list operator on the following evaluated items
+
+(set 'a 'one)
+one
+(setq a (quote one))
+one
+(setf b '(one two))
+(one two)
+;; I get it. "suppress evaluation of symbols" means these are normally symbols,
+;; atoms, whatever and this makes them strings.
+(setf a (first b))
+one
+;; first is an operator
+(setf (first b) a)
+one
+
+;; word
+
+#+END_SRC 

@@ -1,0 +1,48 @@
+# Created 2016-06-01 Wed 22:38
+#+OPTIONS: H:4 num:t toc:nil \n:nil @:t ::t |:t ^:t *:t TeX:t LaTeX:t
+#+TITLE: TWO.GHI
+#+AUTHOR: Mohonri Dorff
+#+LANGUAGE: en
+#+STARTUP: showeverything
+
+* 2.4.1.1 UOU
+
+  The possible binary realtions of a set of three elements I presume to be 27. I searched for how exactly this is supposed to be done completely, but I can't find an answer. But using a = {1, 2, 3} as an example, we can only have the following: {(1,1) (1,2) (1,3) (2,1) (2,2) (2,3) (3,1) (3,2) (3,3)} which would be 9 or 3^2. The pattern follow for bigger sets. Also, we were supposed to just replace the ... in the lisp code, but n and size both are functions so I'm not sure what they're supposed to be doing there. But if we let n become the size of the set the code should only need to be altered so that n is squared.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+
+(defun number-of-binary-relations-on (set)
+  "Computes the number of binary relations on a set with *n* elements."
+  (let ((n (size set))))
+  (* n n))
+
+#+END_SRC
+
+* 2.4.2.1 OUT
+
+I am to argue about the next four sets. I will use examples of the numbers in the set.
+
+** R
+
+R is reflexive solely because all x are members of its set. It is symmetric becuase order doesn't make a differnce. It isn't antisymmetric because any x does equal y so x not equal y isn't true. It is transitive.
+
+** S
+
+S is not reflexive because 1 does not equal 2.
+S is not symmetric because again, 1 does not equal 2. Order matters here and elements are different.
+S is antisymetric because x always does not equal y. No where is there and x that equals y.
+I don't know about transistive.
+
+** T
+
+T is not reflexive because x and y's are always different.
+T is not symmetic for much the same reason. x and y are always different.
+T is antisymmetric because x always does not equal y. No where is there and x that equals y.
+I don't know about transistive.
+
+** U
+
+U is not reflexive because the x's and y's are always different.
+U is not symmetic for much the same reason. x and y are always different.
+U is antisymmetric because x always does not equal y. No where is there and x that equals y.
+I don't know about transistive.
