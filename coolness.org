@@ -1,0 +1,558 @@
+# Created 2016-06-11 Sat 14:29
+#+OPTIONS: H:4 num:t toc:5 \n:nil @:t ::t |:t ^:t *:t TeX:t LaTeX:t
+#+TITLE: Coolness
+#+AUTHOR: Mohonri Dorff
+#+LANGUAGE: en
+#+STARTUP: showeverything
+
+* Exploration 1
+
+** Instuction Given by Instructor
+
+Using the sample code supplied below as a guide and a starting
+point, I implemented these four functions, shown side-by-side with
+their symbolic logic equivalents:
+
+| Function Name     | In Symbols            |
+| for-all-for-all   | $\forall x \forall y$ |
+| for-all-for-some  | $\forall x \exists y$ |
+| for-some-for-all  | $\exists x \forall y$ |
+| for-some-for-some | $\exists x \exists y$ |
+
+Let's examine these quantifications in the context of loops and a
+generic predicate =P=. These will be /nested/ loops, an outer one
+wrapping an inner one, because /nested/ quantification is what is
+being expressed. The =(P x y)= (predicate) function call goes in
+the inner loop, which controls the =y=, while the outer loop
+controls the =x=.
+
+"For all =x= for all =y=" wants to find =(P x y)= always
+true. That's what it means for the nested quantification to be
+true, and naturally, this only works if the domains of =x= and =y=
+are finite. Even then, it really only *works* if these domains are
+reasonably finite --- not /too/ big. Iteration is serial, after
+all, and time is short.
+
+So, =for-all-for-all= loops through =x='s domain, and for each =x=
+loops through each =y= in =y='s domain. On each inner-loop
+iteration it calls =(P x y)= and checks the value. If the value is
+ever false, then =for-all-for-all= is false --- immediately --- no
+need to check any further. Some =y= has been found for some =x=
+where the predicate is false. If both loops finish with nary a
+false evaluation, =for-all-for-all= is ultimately true. There is no
+=x= for which, for any =y=, =(P x y)= is false.
+
+The other function with similarly relatively simple logic is
+=for-some-for-some=. This function loops through =x='s domain, and
+for each =x= loops through each =y= in =y='s domain. On each
+inner-loop iteration it calls =(P x y)= and checks the value. If a
+maktrue value is found, then =for-some-for-some= is true ---
+immediately --- no need to check any further. If both loops finish
+never having triggered true, =for-some-for-some= is ultimately
+false. There is no =x= for which there is some =y= for which =(P x
+   y)= is true.
+
+The other two are trickier. "For all =x= for some =y=" wants =(P x
+   y)= to always be true sometimes, and "for some =x= for all =y="
+wants =(P x y)= to sometimes be true always. AGP to find the best,
+most elegant way to implement for-all-for-some and
+for-some-for-all.
+
+** Logical Explanation
+
+The following is the exhaustive list of nested predicates we are to
+test. I will explain them individually and use my mathematical
+predicate, is-x-multiple-of-y, as an example.
+
+*** TAA
+
+True for All for All. Given some predicate, all items in the first
+list compared to the second list fulfill the requirement making it
+true. The example is here given. x = [3 6 9] and y = [1 3]. 3, 6, and
+9 are all multiples of 1 and of 3, therefore This is a true statement.
+
+*** FAA
+
+False for All for All. Similar to the above except this time just one
+false will turn the expression false because every case must
+work. Keeping x = [3 6 9] and changing to y = [2 3] will set this
+false. 3 and 9 are both not multiples of 2, therefore not every case
+works so the outcome is false.
+
+*** TAS
+
+True for All for Some. In this case, all items in the first list must
+satisfy at least one of the items in the second list. Say x = [2 4
+6]. Y needs at least on item that makes 2, 4, and 6 to be true. So we
+set y = [2 17]. The first item is satisfied but the second item
+isn't. Therefore, all items have been satisfied for some of the
+second.
+
+*** FAS
+
+False for All for Some. Like the above except we can not have any of
+these cases return true. We set x to primes, x = [7 11 13]. Now no
+matter what we put in y, none of the expressions will evaluate to
+true. For the sake of consistancy, y = [2 3 4].
+
+*** TSA
+
+True for Some for All. At least some of the first list must satisfy
+all of the second. The example will be illustrative here. I will set y
+first, y = [2 3 5]. X must have at least one that is a multiple of all
+items in y. We first put 30 in x and that satisfies the at least one
+portions. The other items in x can be either multiples or not, it
+doesn't really matter. Regardless x will be, x= [30 7 9].
+
+*** FSA
+
+False for Some for All. The pattern permeates here; it is like the
+above. However, some of the first list has to be the multiples of none
+of the second list. If we set x = [4 5 6] and y = [7 8 9], any of the
+items is not the multiple of the second items. Since every x item is
+less than y's, they cannot be multiples of the second.
+
+*** TSS
+
+True for Some for Some. This one is probably the easiest to
+satisfy. It must be true that at least one item in x must be a
+multiple of at least one item in y. We can set x = [200 2 1] and y =
+[100 300 400]. The one item in x, 200, is a multiple of at least one
+item in y, 100, the statement is truly. Frankly, in this case, that is
+the only one pair of items that statisfies it, but we only need one
+pair.
+
+*** FSS
+
+False for Some for Some. Comparatively, this is probably the easiest
+to set to false. None of the items in the first list can be multiples
+of items in the second. If everything in x and y is a prime number,
+this should evaluate properly since all items will not be multiples of
+anything else. We will set x = [23, 29, 31] and y = [7 11 13].
+
+** My Work
+
+The way I understood this assignment, we were supposed to implement
+3 tests for each of the four functions and having an expected true
+or false value for each function. That equates to 8 test running 3
+smaller tests each. These test included the following:
+
+| Test Category          | Function             |
+|------------------------+----------------------|
+| Brother Neff's Example | Greater-than         |
+| Mathematical Predicate | Is X a multiple of Y |
+| Everyday Example       | Terrain & Colors     |
+
+Let us get started.
+
+** The Process
+
+*** The Setup
+
+Brother Neff provided us with a lot of starting code. It is here included.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(require 'cl) ; for loop macro
+
+(defun for-all (predicate domain)
+  (loop for item across domain
+	always (funcall predicate item)))
+
+(defun for-some (predicate domain)
+  (loop for item across domain
+	thereis (funcall predicate item)))
+
+(defun tf (t-or-nil)
+  "Convenience adapter converting t to \"TRUE\" and nil to \"FALSE\"."
+  (if t-or-nil "TRUE" "FALSE"))
+
+(defun run-test (function predicate domain1 domain2 expected)
+  "Run function with predicate and domains to get ACTUAL result.
+     Check to see if ACTUAL is the same as EXPECTED, with clarity of test 
+     output achieved by AT-A-GLANCE matching of TRUE with TRUE or FALSE with FALSE."
+  (let ((actual (funcall function predicate domain1 domain2)))
+    (princ (format "\nFor the predicate '%s\nand domains\n%s and %s:
+  %s\nwas expected to return\n%s, the actual value returned was\n%s.\n\n"
+  		   predicate domain1 domain2 function (tf expected) (tf actual)))
+    t))
+
+(defun test-any-or-all (&rest test-names)
+  "Test some or all of many tests identified by their symbol codenames."
+  (let* ((all-testnames '(TAA FAA TAS FAS TSA FSA TSS FSS))
+  	 (todo-testnames (if (null test-names) all-testnames test-names)))
+    (loop for test-name in todo-testnames
+  	  always (funcall (intern (format "test-%s" test-name))))))
+#+END_SRC
+
+*** Exploration 1 Part 1 Functions
+
+I made these as part of Exploration 1 Part 1. These are the functions that
+will take a predicate and apply it across each item in the first domain 
+compared to each item in the second domain and vice versa. It will return
+t or nil based off what domains are passed in.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+; for-all-for-all
+(defun for-all-for-all (predicate domain1 domain2)
+  (loop for item1 across domain1
+	always (loop for item2 across domain2
+		     always (funcall predicate item1 item2))))
+ 	      
+; for-all-for-some
+(defun for-all-for-some (predicate domain1 domain2)
+  (loop for item1 across domain1
+	always (loop for item2 across domain2
+		     thereis (funcall predicate item1 item2))))
+
+; for-some-for-all
+(defun for-some-for-all (predicate domain1 domain2)
+  (loop for item1 across domain1
+	thereis (loop for item2 across domain2
+		     always (funcall predicate item1 item2))))
+
+
+; for-some-for-some
+(defun for-some-for-some (predicate domain1 domain2)
+  (loop for item1 across domain1
+	thereis (loop for item2 across domain2
+		     thereis (funcall predicate item1 item2))))
+#+END_SRC
+
+*** The Predicates
+
+Brother Neff wrote the first predicate - the greater than predicate. I wrote
+the later two.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defun greater-than (x y)
+  "A function of arity 2 that wraps the one already bound to '>."
+  (> x y))
+#+END_SRC
+
+My numerical predicate checks if the first given parameter is a multiple of the
+second given parameter. It does this by checking if the modular answer is equal 
+to zero. If the second given parameter is zero, it will always return zero. 
+Otherwise, the modular divison will try to divide by zero and it will return an error.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defun is-x-multiple-of-y (x y)
+  "This function checks if the first parameter is a multiple of the second"
+  (if (eq y 0)
+      nil
+    (let* ((z (mod x y)))
+       (if (eq z 0)
+	   t
+	 nil))))
+#+END_SRC
+
+My every day example is a list terrains and the certain colors you will see in these terrains.
+As a side note here, I learned that defvar sets a global variable and can only be set once. Eric
+told me to use a defvar because Brother Neff told him to use it when everything was done. I missed the later part so I ended up using it from the start which made most of my functions not work because I thought I was redefining it but I actually wasn't. I spend a solid 40 minutes just on that hiccup before I figured it out and restarted my buffer. There is a second function I include that takes the terrain and color and this function first grabs the associated list of said terrain. From there we cdr the entire list minus the first item which is the terrain. What is left is the colors of that terrain. It then calls the member predicate on the color passed in with the list generated. It will return non-nill if the color is in the list. Finally, we do (not (null ...)) do twice invert and to get a proper t or nil.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+; Specific colors that we would see in certain terrains
+(defvar terrain-colors
+  '((forest brown green orange tan yellow)
+    (marshlands blue brown green red tan teal)
+    (desert black brown green tan)
+    (mountains brown green orange tan white)))
+
+; Function needed to compare an element in any two terrains
+(defun compare-colors (terrain color)
+  (not (null (member color (cdr (assoc terrain terrain-colors))))))
+#+END_SRC
+
+*** The Tests
+
+Brother Neff wrote the prototype for the first two test and I wrote the remaining three. The values I passed in to the functions vary depending on what value I was trying to get out.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defun test-TAA ()
+  (let ((expect-true t))
+    (run-test 'for-all-for-all '> [4 5 6] [1 2 3] expect-true)
+    (run-test 'for-all-for-all 'is-x-multiple-of-y [3 6 9] [1 3] expect-true)
+    (run-test 'for-all-for-all 'compare-colors [forest desert] [brown green] expect-true)
+    ))
+
+(defun test-FAA ()
+  (let ((expect-false nil))
+    (run-test 'for-all-for-all '> [0 -1 2] [7 5 6] expect-false)
+    (run-test 'for-all-for-all 'is-x-multiple-of-y [3 6 10] [1 3] expect-false)
+    (run-test 'for-all-for-all 'compare-colors [forest desert] [yellow green] expect-false)
+    ))
+
+(defun test-TAS ()
+  (let ((expect-true t))
+    (run-test 'for-all-for-some '> [3 4 5] [1 2 7] expect-true)
+    (run-test 'for-all-for-some 'is-x-multiple-of-y [3 6 9] [2 3] expect-true)
+    (run-test 'for-all-for-some 'compare-colors [forest desert] [orange green] expect-true)
+    ))
+
+(defun test-FAS ()
+  (let ((expect-false nil))
+    (run-test 'for-all-for-some '> [1 2 3] [19 2 20] expect-false)
+    (run-test 'for-all-for-some 'is-x-multiple-of-y [1 6 9] [2 3] expect-false)
+    (run-test 'for-all-for-some 'compare-colors [forest mountains] [black red] expect-false)
+    ))
+
+(defun test-TSA ()
+  (let ((expect-true t))
+    (run-test 'for-some-for-all '> [0 2 5] [1 2 3] expect-true)
+    (run-test 'for-some-for-all 'is-x-multiple-of-y [2 8 9] [2 4] expect-true)
+    (run-test 'for-some-for-all 'compare-colors [forest mountains] [yellow green] expect-true)
+    ))
+
+(defun test-FSA ()
+  (let ((expect-false nil))
+    (run-test 'for-some-for-all '> [0 1 2] [3 4 5] expect-false)
+    (run-test 'for-some-for-all 'is-x-multiple-of-y [3 7 9] [2 4] expect-false)
+    (run-test 'for-some-for-all 'compare-colors [desert mountains] [yellow green] expect-false)
+    ))
+
+(defun test-TSS ()
+  (let ((expect-true t))
+    (run-test 'for-some-for-some '> [2 4 6] [1 3 5] expect-true)
+    (run-test 'for-some-for-some 'is-x-multiple-of-y [1 14 30] [7 13] expect-true)
+    (run-test 'for-some-for-some 'compare-colors [forest mountains] [yellow red] expect-true)
+    ))
+
+(defun test-FSS ()
+  (let ((expect-false nil))
+    (run-test 'for-some-for-some '> [1 2 3] [4 5 6] expect-false)
+    (run-test 'for-some-for-some 'is-x-multiple-of-y [17 19 21] [5 9] expect-false)
+    (run-test 'for-some-for-some 'compare-colors [forest desert] [blue red] expect-false)
+    ))
+#+END_SRC
+
+*** The Results
+
+For the predicate '>
+and domains
+[4 5 6] and [1 2 3]:
+  for-all-for-all
+was expected to return
+TRUE, the actual value returned was
+TRUE.
+
+
+For the predicate 'is-x-multiple-of-y
+and domains
+[3 6 9] and [1 3]:
+  for-all-for-all
+was expected to return
+TRUE, the actual value returned was
+TRUE.
+
+
+For the predicate 'compare-colors
+and domains
+[forest desert] and [brown green]:
+  for-all-for-all
+was expected to return
+TRUE, the actual value returned was
+TRUE.
+
+
+For the predicate '>
+and domains
+[0 -1 2] and [7 5 6]:
+  for-all-for-all
+was expected to return
+FALSE, the actual value returned was
+FALSE.
+
+
+For the predicate 'is-x-multiple-of-y
+and domains
+[3 6 10] and [1 3]:
+  for-all-for-all
+was expected to return
+FALSE, the actual value returned was
+FALSE.
+
+
+For the predicate 'compare-colors
+and domains
+[forest desert] and [yellow green]:
+  for-all-for-all
+was expected to return
+FALSE, the actual value returned was
+FALSE.
+
+
+For the predicate '>
+and domains
+[3 4 5] and [1 2 7]:
+  for-all-for-some
+was expected to return
+TRUE, the actual value returned was
+TRUE.
+
+
+For the predicate 'is-x-multiple-of-y
+and domains
+[3 6 9] and [2 3]:
+  for-all-for-some
+was expected to return
+TRUE, the actual value returned was
+TRUE.
+
+
+For the predicate 'compare-colors
+and domains
+[forest desert] and [orange green]:
+  for-all-for-some
+was expected to return
+TRUE, the actual value returned was
+TRUE.
+
+
+For the predicate '>
+and domains
+[1 2 3] and [19 2 20]:
+  for-all-for-some
+was expected to return
+FALSE, the actual value returned was
+FALSE.
+
+
+For the predicate 'is-x-multiple-of-y
+and domains
+[1 6 9] and [2 3]:
+  for-all-for-some
+was expected to return
+FALSE, the actual value returned was
+FALSE.
+
+
+For the predicate 'compare-colors
+and domains
+[forest mountains] and [black red]:
+  for-all-for-some
+was expected to return
+FALSE, the actual value returned was
+FALSE.
+
+
+For the predicate '>
+and domains
+[0 2 5] and [1 2 3]:
+  for-some-for-all
+was expected to return
+TRUE, the actual value returned was
+TRUE.
+
+
+For the predicate 'is-x-multiple-of-y
+and domains
+[2 8 9] and [2 4]:
+  for-some-for-all
+was expected to return
+TRUE, the actual value returned was
+TRUE.
+
+
+For the predicate 'compare-colors
+and domains
+[forest mountains] and [yellow green]:
+  for-some-for-all
+was expected to return
+TRUE, the actual value returned was
+TRUE.
+
+
+For the predicate '>
+and domains
+[0 1 2] and [3 4 5]:
+  for-some-for-all
+was expected to return
+FALSE, the actual value returned was
+FALSE.
+
+
+For the predicate 'is-x-multiple-of-y
+and domains
+[3 7 9] and [2 4]:
+  for-some-for-all
+was expected to return
+FALSE, the actual value returned was
+FALSE.
+
+
+For the predicate 'compare-colors
+and domains
+[desert mountains] and [yellow green]:
+  for-some-for-all
+was expected to return
+FALSE, the actual value returned was
+FALSE.
+
+
+For the predicate '>
+and domains
+[2 4 6] and [1 3 5]:
+  for-some-for-some
+was expected to return
+TRUE, the actual value returned was
+TRUE.
+
+
+For the predicate 'is-x-multiple-of-y
+and domains
+[1 14 30] and [7 13]:
+  for-some-for-some
+was expected to return
+TRUE, the actual value returned was
+TRUE.
+
+
+For the predicate 'compare-colors
+and domains
+[forest mountains] and [yellow red]:
+  for-some-for-some
+was expected to return
+TRUE, the actual value returned was
+TRUE.
+
+
+For the predicate '>
+and domains
+[1 2 3] and [4 5 6]:
+  for-some-for-some
+was expected to return
+FALSE, the actual value returned was
+FALSE.
+
+
+For the predicate 'is-x-multiple-of-y
+and domains
+[17 19 21] and [5 9]:
+  for-some-for-some
+was expected to return
+FALSE, the actual value returned was
+FALSE.
+
+
+For the predicate 'compare-colors
+and domains
+[forest desert] and [blue red]:
+  for-some-for-some
+was expected to return
+FALSE, the actual value returned was
+FALSE.
+
+t
+
+
+** Collaborators
+  
+| Collaborators   | Contribution                                                                     |
+|-----------------+----------------------------------------------------------------------------------|
+| Matt Bloomfield | A lot of debugging and general explanation.                                      |
+| Eric Allsop     | Showed me how the compare function worked for items in my every day example list |
+| Pao V.          | Helped me with my numerical predicate.                                           |
+| Aaron Pobst     | Helped me understand these logical statement. This covers all the TAA, FAS, etc. |
+
+** What I learned
+
+The logical concepts were not as hard to implement as I thought they would be. I learned them through the book and in class and this exploration really solidfied those concepts. What I had the hardest time with is LISP. It still intimidates me and I had a lot of help but I got through it. What I was so proud of this time around was the mathematical predicate I had to write. I thought of it all on my own and I wrote the entire thing all on my own. It surprise me. I think a big thing with learning a new language is the confidence involed with tackling a new problem. It was a simple function but I am still very proud of it. Also, I learned how to make a TOC in my ORG file and tables as well. Thery're pretty nifty.
