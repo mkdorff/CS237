@@ -1,0 +1,80 @@
+#+TITLE: Discrete or Continuous
+#+AUTHOR: Mohonri Dorff
+#+LANGUAGE:  en
+#+OPTIONS:   H:4 num:t toc:nil \n:nil @:t ::t |:t ^:t *:t TeX:t LaTeX:t
+#+STARTUP: showeverything
+
+* Process
+  Initially I was doing some weird trigonometry with triangles and then 
+  squares, using the radius and apothems. I was getting somewhere but I wasn't
+  drawing the connection and I definitely wasn't seeing the pattern. Then, 
+  when Brother Neff showed us the hint, it because really obvious. Again I 
+  tried to reason it out in my head, and I couldn't get it. I did see the
+  pattern though so I wrote a program that did what I needed it to do. When
+  getting to a 1000000000-side polygon, the radius hardly changed and I 
+  thought that was a pretty good estimation.
+
+* C++ code
+  Here I include the code that gives a numerical estimate of the radius:
+
+  #include <iostream>
+  #include <math.h>
+  using namespace std;
+
+  int main() {
+    double r1 = 1;
+    double numSide = 3;
+    double r2 = 0;
+
+    for (int i = 0; i < 1000000000; i++) {
+      r2 = r1/cos(3.14159265358979323846264338/numSide);
+      r1 = r2;
+      numSide += 1;
+  }
+
+  cout.precision(20) << endl;
+
+  return 0;
+}
+
+** Tangling stuff I guess?
+*** Something something dark side
+
+#+BEGIN_SRC c++ :tangle limiting-radius.cpp
+#include <iostream>
+#include <cstdlib>
+#include <math.h>
+using namespace std;
+
+double limitingRadius(long numSides) {
+  double result = 1.0;
+  for (long i = 3; i <= numSides; i++) {
+    result /= cos(M_PI / i);
+  }
+  return result;
+}
+
+int main() {
+  long numSides = atol(argv[1]);
+}
+
+#+END_SRC
+
+* Report
+  The basic fomula is:
+  
+  new-radius = old-radius / (cos(pi/number-of-sides) )
+
+  with that, the final estimation I got was 8.7000366...
+
+  Aside from the help we all recieved from the teacher, I did not collobrate
+  or get help from anyone. 
+
+  In pursuing the answer to whether this is a discrete or continuous math 
+  problem, I also had to explore how I was going to do the problem. Of 
+  course, I am most familiar in the continuos world so that's what I attempted.
+  The math I did do were continuous but I'm thinking this and really any
+  problem can be both discrete and continuous. It probably just easier to solve
+  with one or the other. I'm definitely thinking there is a discrete way to do 
+  this probelm because it's really just a matter of the next state being
+  dependent on the previous. I just have no idea on how to use discrete math.
