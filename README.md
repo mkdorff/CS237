@@ -8,4 +8,4 @@ Coolness was our first project exploring predicates. There are a bunch of school
 I included an intro to Emacs Lisp I found because it took me a while to find it. Just in case you now have a burning desire to learn it.
 
 ## RSA
-Wellness is an RSA implementation, but it only works with words 3 characters long or less - because the numbers get too big and I don't handl overflow and because Emacs Lisp is hard.
+Wellness is an RSA implementation, but it only works with words 3 characters long or less - because the numbers get too big and I don't handle overflow and because Emacs Lisp is hard.
