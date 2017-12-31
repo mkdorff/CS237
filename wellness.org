@@ -1,0 +1,332 @@
+# Created 2016-06-22 Sat 21:59
+#+OPTIONS: H:4 num:t toc:5 \n:nil @:t ::t |:t ^:t *:t TeX:t LaTeX:t
+#+TITLE: Exploration 2: Wellness
+#+AUTHOR: Mohonri Dorff
+#+LANGUAGE: en
+#+STARTUP: showeverything
+
+* Introduction
+
+I have a lot more respect for RSA now. I knew it was magical and
+required lots of mathematics before, but now that I've dabbled in it
+and understand how it generally works, I have a lot more appreciation
+for it. I have learned a great deal from working on this exploration.
+At the very bottom, I have kept the original contract for grading
+purposes.
+
+* Explanation
+
+RSA stands for Rivest, Shamir, and Adleman. It's just based of the
+last names of the guys that came up with it. It is a cryptosystem that
+has both a public and private key part. 
+
+It starts out with the fact that we want to encrypt, transfer and
+decrypt a message. The encryption and decryption is basically
+identical math, just with different numbers. We will have our message
+represented in the form of one number (more on this later). That
+number will be raised to the power of the public key (e)  and the
+entire expression will be modulo divided by some n (again, more on
+this later). The result is our encrypted message in the form of some
+number. We can retrieve our message from this by taking the encrypted
+message, raising it to the power of the private key (d - a lot more on
+this later but d is very closely related to e) and that entire thing
+modulo divided by the same n as before. That's the basics. Every part
+of the equation is very closely related so we'll dive a little deeper
+as we go through each step.
+
+I will here define everything we will need.
+
+      p - arbitrary prime #1,               Needed for all calculations
+      q - arbitrary prime #2,               Ditto
+      n = p * q,                            Modulus
+\Phi(n) = (p - 1)*(q - 1),                  Totient
+      e = arbitrary prime #3 
+          (with some restrictions),         Public Key
+      d = \Phi(n)^-1
+          (modulos multiplicative inverse), Private Key
+      m = numerical form of message,        Message
+      c = encrypted numerical form,         Message (Math-ed)
+
+** p & q
+
+We must first pick a p and q. They must be primes. Typically, the
+bigger they are the better. They affect everything we do from here on
+out so we definitely want them big. I chose to simply generate them
+randomly to make it easier on myself, I made them be between 500
+and 1000, which isn't a secure choice but for the scope of the
+exploration, this should suffice. I also included some functions from
+the GNU library that were necessary to deal simply with
+primes. Require didn't work for me so this is what I had to do.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+The following two functions are from the GNU library.
+
+(defun next-prime (n)
+  "Return the next prime number after N, or else nil."
+  (if (integerp n)
+    (cond
+     ((> n 1)
+      (let* ((k (if (= 0 (% n 2));start k at next odd number after n
+		    (1+ n)
+		  (+ n 2))))
+	(while (not (prime-p k)) ;and loop upward over odd numbers
+	  (setq k (+ k 2)))
+	k))
+     (t 2))
+    nil))
+
+(defun prime-p (n)
+  "Return N if it is a prime number, else nil."
+  (interactive)
+  (if (integerp n)
+      (cond ((< n 2) nil)		;there are no primes below 2
+	    ((= n 2) 2)			;special case for the only even prime
+	    ((= 0 (% n 2)) nil)		;there are no other even primes
+	    (t (catch 'RESULT		;else we have a positive odd candidate value
+		 (let ((limit (floor (sqrt n)))
+		       (divisor 2))
+		   (while (<= divisor limit)
+		     (if (= 0 (% n divisor))
+			 (throw 'RESULT nil))
+		     (setq divisor (1+ divisor)))
+		   n))))
+    nil))
+
+(defun find-p-and-q (message)
+  (let* ((p-and-q-list '()))
+    (add-to-list 'p-and-q-list (next-prime (+ 500 (random 500))))
+    (append p-and-q-list (next-prime (+ 500 (random 500))))))
+#+END_SRC
+
+** n & totient
+
+The next thing to do is calculate n, which is the modulo that we will
+be modulo dividing the message and encrypted message with. It is
+rather straight forward. We obtain it by multiplying p and q together.
+The totient is just something we need for later on and that is
+computer by multiplying p-1 and q-1 together.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defun calc-n-and-totient (p q)  
+  (let* ((n-and-totient '()))
+    (add-to-list 'n-and-totient (* p q))
+    (add-to-list 'n-and-totient (* (- p 1) (- q 1)))
+    (reverse n-and-totient)))
+#+END_SRC
+
+** e & d
+
+We now need to generate the public and private keys. The public key (e)
+has a few prerequisites; its gcd with n must be 1, essentially meaning
+e has to be a prime and it must also be less then the totient. It
+seems to be a standard for e to be 65537 so that is what we statically
+made ours. In order for that to be the case, the p and q had to be
+certainly big enough and that is why i attached the lower bound of 500
+for each of them. Thus we just return 65537 when asked to find e.
+
+The private key is a lot more math. We need both the public key and
+the totient to create it. Essenitally we need the modulos
+multiplicative inverse of the public key mod the totient. We used the
+Extended Euclidean Algorithm. Lucky and I wrote the logic first in c++
+and Lucky converted most of it to eLisp. She did some nice magic, but
+the second function now returns the inverse, and that is our private
+key. I also just realized that the find-inverse function was supplied
+for us. Regardless, I will included our homegrown version. 
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defun find-e (totient) 65537)
+
+(defun find-inverse (e totient)
+   (let ((variable 0)
+        (remainder totient)
+        (newvar 1)
+        (newremainder e))
+    (while (calc-eval "$1 != 0" 'pred newremainder)
+      (let ((quotient (calc-eval "$1 \\ $2" nil remainder newremainder)))
+        (cl-psetf variable newvar
+                  newvar (calc-eval "$1 - $2 * $3" nil
+                                  variable quotient newvar))
+        (cl-psetf remainder newremainder
+                  newremainder (calc-eval "$1 - $2 * $3" nil
+                                  remainder quotient newremainder))))
+    (if (calc-eval "$1 < 0" 'pred variable)
+        (calc-eval "$1 + $2" nil variable totient)
+     (string-to-number variable))))
+#+END_SRC
+
+** from/to base 27
+
+We know how all the functions to create the values. Before we run it
+through the code provided for us to test our RSA, we have to handle
+the fact that the cryptosystem we have encrypts and decrypts a number
+that represents our message. The simplest thing we can do is do a
+straight casting from our alphabet to a base 27 table. Thus A is
+represented by 1, B is 2, C is 3, D is 4, E is 5, F is 6, G is 7, H
+is 8, I is 9, and so forth. Now, we can give weight to each character
+in the position they are in. The character value will be multiplied by
+27 to the power of it's position and we will sum up all the values of
+the generated numbers. If we are familiar with hex or binary, we will
+understand that the sum will be unique and can only represent one
+number according to our conversion algorithm. The following two
+functions are the implmentation of this table that I wrote. They took
+a long time to write.
+
+| @ | 0 | I |  9 | R | 18 |
+| A | 1 | J | 10 | S | 19 |
+| B | 2 | K | 11 | T | 20 |
+| C | 3 | L | 12 | U | 21 |
+| D | 4 | M | 13 | V | 22 |
+| E | 5 | N | 14 | W | 23 |
+| F | 6 | O | 15 | X | 24 |
+| G | 7 | P | 16 | Y | 25 |
+| H | 8 | Q | 17 | Z | 26 |
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(defun from-base-27 (message)
+  (let* ((message (upcase message))
+	 (count (- (length message) 1))
+	 (message-list '()))
+    (loop for c across message
+	  do (add-to-list 'message-list (* (- c 64) (expt 27 count)))
+	  do (setq count (- count 1)))
+    (loop for i in message-list
+	  sum i)))
+  
+(defun to-base-27 (message)
+  (let* ((decrypted '())
+	 (count 1))
+    (while (>= message (expt 27 (- count 1)))
+      (add-to-list 'decrypted
+		   (byte-to-string (+ (/
+				       (% message (expt 27 count))
+				       (expt 27 (- count 1)))
+				      64)))
+      (setq message (- message (% message (expt 27 count))))
+      (setq count (+ count 1)))
+    (apply 'concat decrypted)))
+#+END_SRC
+
+** Encryption & Decryption
+
+The general process has already been outlined, so I will keep it
+brief. Once we generate the needed values and numerical message, we
+run the message through the following algorithms:
+
+Encrypt:  (message)^(public key) % (n) => (encrypted message)
+          (m^e)%n = c
+
+Decrypt:  (encrypted message)^(private key) % (n) => (message)
+          (c^d)%n = m
+
+The given code does all this. The test-rsa function test the round
+trip and in most cases it works. Since p and q are generated randomly,
+there are some cases where the numbers get too big (I believe) and
+errors are thrown. 
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(require 'calc) ; for big integer functions
+
+(defun pow-mod (b n m)
+  "Computes b^n%m (very inefficiently)."
+  (let ((x 1))
+    (dotimes (i n)
+      (setq x (% (* x b) m)))
+    x))
+
+(defun rsa-encrypt (message &optional raw)
+  (let* ((message (if raw message (from-base-27 message)))
+         (p-and-q (find-p-and-q message))
+         (p (car p-and-q))
+         (q (cdr p-and-q))
+         (n-and-totient (calc-n-and-totient p q))
+         (n (car n-and-totient))
+         (totient (cdr n-and-totient))
+         (e (find-e totient))
+         (encrypted (pow-mod message e n)))
+    (list encrypted p q e)))
+
+(defun rsa-decrypt (encrypted-p-q-e &optional raw)
+  (let* ((encrypted (nth 0 encrypted-p-q-e))
+         (p (nth 1 encrypted-p-q-e))
+         (q (nth 2 encrypted-p-q-e))
+         (e (nth 3 encrypted-p-q-e))
+         (n-and-totient (calc-n-and-totient p q))
+         (n (car n-and-totient))
+         (totient (cdr n-and-totient))
+         (d (find-inverse e totient))
+         (message (pow-mod encrypted d n)))
+    (if raw
+        (list n totient d message)
+      (to-base-27 message))))
+
+(defun round-trip (message)
+  (setq message (mapconcat #'identity (split-string message " ") "@"))
+  (string= message (rsa-decrypt (rsa-encrypt message))))
+
+(defun test-rsa (&optional arg-string)
+  (let* ((message-with-spaces (or arg-string (getenv "ARGS")))
+         (message (mapconcat #'identity (split-string message-with-spaces " ") "@"))
+         (encrypted (rsa-encrypt message))
+         (raw t)
+         (decrypted (rsa-decrypt encrypted raw))
+         (decrypted-message (to-base-27 (nth 3 decrypted)))
+         (decrypted-message-with-spaces
+          (mapconcat #'identity (split-string decrypted-message "@") " "))
+         (success (string= message-with-spaces decrypted-message-with-spaces)))
+    (princ (format "\"%s\"\nwas encoded and encrypted as\n%s\nthen decrypted as\n%s\nand decoded as\n\"%s\"\n"
+                   message-with-spaces encrypted decrypted decrypted-message-with-spaces))
+    (princ (if success "" "un"))
+    (princ "successfully.\n")
+    success))
+#+END_SRC
+
+* Report
+
+I learned a lot about RSA and I'm really glad I did this
+exploration. Cryptography has always interested me. I was able to get
+the TLA to make a round trip and I explained how this works. That was
+the extent of my work. I worked and tried to get the full name working
+but I realized I would have to use big ints and I called it good there.
+
+* Collaborators
+  
+I recieved a lot of aid from Cam along the way. All the functions wre
+written seperately, but he helped a lot on how things should be
+done. Lucky and I worked together on a lot of this and flushed out the
+functions together, bouncing ideas and the work off each other. I
+needed the lisp practice so I wrote most of the function logic and
+that is why you will find such odd and inefiicient ways to get things
+done. Lucky wrote practically all of the find-inverse function.
+
+* Contract
+
+I commit to implement enough code to not only make my *TLA* but also
+my *name* complete a round-trip, encoded into a number via a working
+=from-base-27=. This, according to some suggestions given by the
+instructor, should be sufficient for full credit and a little more.
+
+I will also include an explanation of /how/ and /why/ RSA works. 
+
+* Approved By Brother Neff
+
+Mohonri, I approve your contract with the following clarifications,
+where PP6 means Possible Points if completed by July 6th, and PP13
+means Possible Points if completed by July 13th:
+
+| Task You Will Complete                                                   | PP6 | PP13 |
+|--------------------------------------------------------------------------+-----+------|
+| Implement enough code to make your *TLA* (encoded into a number via      |     |      |
+| a working =from-base-27=) complete a round-trip.                         |  90 |   85 |
+|                                                                          |     |      |
+| *In addition*, implement enough code to make your *name* (encoded into a |     |      |
+| number via a working =from-base-27=) complete a round-trip.              | 100 |   90 |
+|                                                                          |     |      |
+| *In addition*, report on and demonstrate your grasp of elementary number |     |      |
+| theory by explaining /how/ RSA works.                                    | 105 |  100 |
+|                                                                          |     |      |
+| *In addition*, report on and demonstrate your grasp of elementary number |     |      |
+| theory by explaining /why/ RSA works.                                    | 110 |  105 |
+
+"Possible Points" is the maximum attainable out of 100 if your final
+exploration submission is free of other point-losing problems, such as
+mechanical infelicities, etc.
